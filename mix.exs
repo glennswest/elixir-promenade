@@ -38,7 +38,7 @@ defmodule Promenade.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      exrm: "~> 0.18.1",
+      exrm: "~> 1.0.2",
       exactor: "~> 2.2.0",
       plug: "~> 1.1.2",
       cowboy: "~> 1.0.0",
