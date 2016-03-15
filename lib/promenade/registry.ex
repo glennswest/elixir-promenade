@@ -36,7 +36,7 @@ defmodule Promenade.Registry do
   
   defp handle_metric(state, {:gauge, name, value, labels}) do
     %State { state | gauges: state.gauges
-      |> Map.update(name, %{ labels => value }, fn(inner) -> inner
+      |> Map.update(name, (%{} |> Map.put(labels, value)), fn(inner) -> inner
         |> Map.put(labels, value)
       end)
     }
@@ -44,7 +44,7 @@ defmodule Promenade.Registry do
   
   defp handle_metric(state, {:counter, name, value, labels}) do
     %State { state | counters: state.counters
-      |> Map.update(name, %{ labels => value }, fn(inner) -> inner
+      |> Map.update(name, (%{} |> Map.put(labels, value)), fn(inner) -> inner
         |> Map.update(labels, value, &(&1 + value))
       end)
     }
