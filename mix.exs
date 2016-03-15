@@ -18,7 +18,7 @@ defmodule Promenade.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger],
+      applications: [:logger, :plug, :cowboy],
       mod: {Promenade, []},
       env: [
         http_port: 8080,
