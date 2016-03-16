@@ -2,7 +2,7 @@
 machine:
   environment:
     PATH: "$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
-    ERLANG_VERSION: "18.1"
+    ERLANG_VERSION:  "18.1"
     ELIXIR_VERSION: "1.1.1"
 
 dependencies:
@@ -12,8 +12,8 @@ dependencies:
     - if ! asdf | grep version; then git clone https://github.com/HashNuke/asdf.git ~/.asdf; fi
     - asdf plugin-add erlang https://github.com/HashNuke/asdf-erlang.git
     - asdf plugin-add elixir https://github.com/HashNuke/asdf-elixir.git
-    - asdf install erlang ${ERLANG_VERSION}
-    - asdf install elixir ${ELIXIR_VERSION}
+    - asdf install erlang $ERLANG_VERSION
+    - asdf install elixir $ELIXIR_VERSION
     - yes | mix deps.get
 
 test:
