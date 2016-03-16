@@ -1,5 +1,6 @@
 
 defmodule Promenade.UdpListener do
+  require Logger
   
   def port,        do: Application.fetch_env!(:promenade, :udp_port)
   def inet_opts,   do: [:binary, active: false]
@@ -9,6 +10,8 @@ defmodule Promenade.UdpListener do
   
   def run(name, registry) do
     Process.register(self, name)
+    Logger.info("#{inspect name} listening for UDP input on port #{port}")
+    
     handle_packets(registry, make_socket)
   end
   
