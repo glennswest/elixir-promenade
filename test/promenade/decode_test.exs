@@ -50,7 +50,7 @@ defmodule Promenade.DecodeTest do
   
   test "line parses a gauge line with labels" do
     assert Promenade.Decode.line("foo{x=\"XXX\",y=\"YYY\"}:88.8|g")
-      == {:gauge, "foo", 88.8, %{ "x" => "XXX", "y" => "YYY"}}
+      == {:gauge, "foo", 88.8, %{ "x" => "XXX", "y" => "YYY" }}
   end
   
   test "line parses a gauge line with empty label group" do
