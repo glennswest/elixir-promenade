@@ -12,13 +12,19 @@ dependencies:
     - if ! asdf | grep version; then git clone https://github.com/HashNuke/asdf.git ~/.asdf; fi
     - asdf plugin-add erlang https://github.com/HashNuke/asdf-erlang.git
     - asdf plugin-add elixir https://github.com/HashNuke/asdf-elixir.git
-    - echo -e "erlang ${ERLANG_VERSION}\nelixir ${ELIXIR_VERSION}\n" > .tool-versions
+    - echo -e "erlang $ERLANG_VERSION\nelixir $ELIXIR_VERSION\n" > .tool-versions
     - asdf install
     - mix do local.hex --force, hex.info, local.rebar, deps.get, deps.compile
+    - sudo service docker start
 
 test:
   override:
-    - mix compile
-    - mix test --no-start
+    - ? |
+        case $CIRCLE_NODE_INDEX in
+          0) mix test --no-start ;;
+          1) docker build -t local/promenade . ;;
+        esac
+      :
+        parallel: true
   post:
     - docker build -t local/promenade .
