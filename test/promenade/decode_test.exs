@@ -53,6 +53,11 @@ defmodule Promenade.DecodeTest do
       == {:gauge, "foo", 88.8, %{ "x" => "XXX", "y" => "YYY"}}
   end
   
+  test "line parses a gauge line with empty label group" do
+    assert Promenade.Decode.line("foo{}:88.8|g")
+      == {:gauge, "foo", 88.8, %{}}
+  end
+  
   test "packet parses some newline-separated lines" do
     assert Promenade.Decode.packet("foo:88.8|g\nbar:99|c\nbaz:11|s\n") == [
       {:gauge, "foo", 88.8, %{}},
