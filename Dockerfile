@@ -13,8 +13,10 @@ RUN apk add --update -t build-deps \
     mix do local.hex --force, hex.info, local.rebar
 
 # Copy the source files into a temporary source directory
-COPY mix.exs lib config rel/relx.config \
-     /opt/promenade/src/
+COPY mix.exs         /opt/promenade/src/mix.exs
+COPY lib             /opt/promenade/src/lib
+COPY config          /opt/promenade/src/config
+COPY rel/relx.config /opt/promenade/src/rel/relx.config
 WORKDIR /opt/promenade/src
 
 # Build release and move it to the outer directory
