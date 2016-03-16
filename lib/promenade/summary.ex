@@ -9,7 +9,7 @@ defmodule Promenade.Summary do
     sum:   0.0
   
   # Target 0.5% accuracy for 5th percentile, 2% for 50th percentile, etc.
-  @f_targets     [{0.05, 0.005}, {0.5, 0.02}, {0.95, 0.005}]
+  @f_targets [{0.05, 0.005}, {0.5, 0.02}, {0.95, 0.005}]
   
   # Compress data after every 10th observation.
   @compress_rate 10
