@@ -1,9 +1,11 @@
 
 defmodule Promenade.TextFormat do
+  alias Promenade.Summary
   
   def snapshot(%Promenade.Registry.State{} = state) do
-    section(:gauge, state.gauges) <> "\n" <>
-    section(:counter, state.counters)
+    section(:gauge,   state.gauges)   <> "\n" <>
+    section(:counter, state.counters) <> "\n" <>
+    section(:summary, state.summaries)
   end
   
   def section(type, metrics) do
@@ -15,12 +17,22 @@ defmodule Promenade.TextFormat do
   def metric(type, name, entries) do
     "# TYPE #{name} #{type}\n" <> (
       entries
-      |> Enum.map(&(entry(name, elem(&1, 0), elem(&1, 1))))
+      |> Enum.map(&(entry(type, name, elem(&1, 0), elem(&1, 1))))
       |> Enum.join
     )
   end
   
-  def entry(name, labels, value) do
+  def entry(:summary, name, labels, s) do
+    ql = "quantile"
+    
+       entry(nil, name, Map.put(labels, ql, "0.5"),  Summary.quantile(s, 0.5))
+    <> entry(nil, name, Map.put(labels, ql, "0.9"),  Summary.quantile(s, 0.9))
+    <> entry(nil, name, Map.put(labels, ql, "0.99"), Summary.quantile(s, 0.99))
+    <> entry(nil, "#{name}_sum",   labels, Summary.sum(s))
+    <> entry(nil, "#{name}_total", labels, Summary.total(s))
+  end
+  
+  def entry(_, name, labels, value) do
     "#{name}#{labels_text(labels)} #{value}\n"
   end
   
