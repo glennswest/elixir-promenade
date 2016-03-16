@@ -15,14 +15,7 @@ dependencies:
     - echo -e "erlang $ERLANG_VERSION\nelixir $ELIXIR_VERSION\n" > .tool-versions
     - asdf install
     - mix do local.hex --force, hex.info, local.rebar, deps.get, deps.compile
-    - sudo service docker start
 
 test:
   override:
-    - ? |
-        case $CIRCLE_NODE_INDEX in
-          0) mix test --no-start ;;
-          1) docker build -t local/promenade . ;;
-        esac
-      :
-        parallel: true
+    - mix test --no-start
