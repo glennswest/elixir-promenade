@@ -26,5 +26,3 @@ test:
         esac
       :
         parallel: true
-  post:
-    - docker build -t local/promenade .
