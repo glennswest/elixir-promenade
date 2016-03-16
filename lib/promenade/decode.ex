@@ -16,6 +16,7 @@ defmodule Promenade.Decode do
         case suffix do
           "|g" -> :gauge
           "|c" -> :counter
+          "|s" -> :summary
           _    -> :unknown_suffix = suffix
         end
       

@@ -43,13 +43,21 @@ defmodule Promenade.DecodeTest do
       == {:counter, "bar", 99, %{}}
   end
   
+  test "line parses a simple summary line" do
+    assert Promenade.Decode.line("baz:11|s")
+      == {:summary, "baz", 11, %{}}
+  end
+  
   test "line parses a gauge line with labels" do
     assert Promenade.Decode.line("foo{x=\"XXX\",y=\"YYY\"}:88.8|g")
       == {:gauge, "foo", 88.8, %{ "x" => "XXX", "y" => "YYY"}}
   end
   
   test "packet parses some newline-separated lines" do
-    assert Promenade.Decode.packet("foo:88.8|g\nbar:99|c\n")
-      == [{:gauge, "foo", 88.8, %{}}, {:counter, "bar", 99, %{}}]
+    assert Promenade.Decode.packet("foo:88.8|g\nbar:99|c\nbaz:11|s\n") == [
+      {:gauge, "foo", 88.8, %{}},
+      {:counter, "bar", 99, %{}},
+      {:summary, "baz", 11, %{}},
+    ]
   end
 end
