@@ -42,6 +42,10 @@ defmodule Promenade.Mixfile do
       exactor: "~> 2.2.0",
       plug: "~> 1.1.2",
       cowboy: "~> 1.0.0",
+      quantile_estimator: [
+        git: "https://github.com/odo/quantile_estimator.git",
+        tag: "a68cb3ede050e2a9a451fb28b98e25cd293975a4",
+      ],
     ]
   end
 end

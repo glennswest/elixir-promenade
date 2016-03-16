@@ -7,8 +7,10 @@ defmodule Promenade.Registry do
     defstruct \
       gauges: %{},
       counters: %{},
-      histograms: %{}
+      summaries: %{}
   end
+  
+  alias Promenade.Summary
   
   def start_link(name, io_modules) do
     GenServer.start_link(__MODULE__, io_modules, name: name)
@@ -36,7 +38,7 @@ defmodule Promenade.Registry do
   
   defp handle_metric(state, {:gauge, name, value, labels}) do
     %State { state | gauges: state.gauges
-      |> Map.update(name, (%{} |> Map.put(labels, value)), fn(inner) -> inner
+      |> Map.update(name, new_map(labels, value), fn(m) -> m
         |> Map.put(labels, value)
       end)
     }
@@ -44,9 +46,21 @@ defmodule Promenade.Registry do
   
   defp handle_metric(state, {:counter, name, value, labels}) do
     %State { state | counters: state.counters
-      |> Map.update(name, (%{} |> Map.put(labels, value)), fn(inner) -> inner
+      |> Map.update(name, new_map(labels, value), fn(m) -> m
         |> Map.update(labels, value, &(&1 + value))
       end)
     }
+  end
+  
+  defp handle_metric(state, {:summary, name, value, labels}) do
+    %State { state | summaries: state.summaries
+      |> Map.update(name, Summary.new_map(labels, value), fn(m) -> m
+        |> Map.update(labels, value, &(&1 |> Summary.observe(value)))
+      end)
+    }
+  end
+  
+  defp new_map(key, value) do
+    %{} |> Map.put(key, value)
   end
 end
