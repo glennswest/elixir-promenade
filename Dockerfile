@@ -8,7 +8,8 @@ EXPOSE 8080
 RUN apk add --update erlang erlang-crypto erlang-sasl erlang-erl-interface
 
 # Install system build dependencies
-RUN apk add --update -t build-deps erlang-syntax-tools erlang-eunit elixir && \
+RUN apk add --update -t build-deps \
+      git erlang-syntax-tools erlang-eunit elixir && \
     mix do local.hex --force, hex.info, local.rebar
 
 # Copy the source files into a temporary source directory
