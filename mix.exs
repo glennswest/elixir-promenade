@@ -18,7 +18,12 @@ defmodule Promenade.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger, :plug, :cowboy],
+      applications: [
+        :logger,
+        :plug,
+        :cowboy,
+        :quantile_estimator
+      ],
       mod: {Promenade, []},
       env: [
         http_port: 8080,
@@ -43,8 +48,8 @@ defmodule Promenade.Mixfile do
       plug: "~> 1.1.2",
       cowboy: "~> 1.0.0",
       quantile_estimator: [
-        git: "https://github.com/odo/quantile_estimator.git",
-        tag: "a68cb3ede050e2a9a451fb28b98e25cd293975a4",
+        git: "https://github.com/jemc/quantile_estimator.git",
+        sha: "37f4d6cc5808dc6c571563c3b76ca1a71b7cff3e",
       ],
     ]
   end
