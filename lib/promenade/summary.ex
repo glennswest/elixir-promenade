@@ -1,6 +1,5 @@
 
 defmodule Promenade.Summary do
-  alias Promenade.Util
   alias Promenade.Summary
   
   defstruct \
@@ -14,7 +13,7 @@ defmodule Promenade.Summary do
   # Compress data after every 10th observation.
   @compress_rate 10
   
-  def new(labels, value) do
+  def new(_labels, value) do
     qe =
       @f_targets
       |> :quantile_estimator.f_targeted
