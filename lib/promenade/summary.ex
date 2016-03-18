@@ -40,13 +40,4 @@ defmodule Promenade.Summary do
   def quantile(summary, q), do: :quantile_estimator.quantile(q, summary.qe)
   def total(summary),       do: summary.total
   def sum(summary),         do: summary.sum
-  
-  def present(summary, name, labels, show) do
-    show.(name, Map.put(labels, "quantile", "0.5"),  quantile(summary, 0.5))
-    show.(name, Map.put(labels, "quantile", "0.9"),  quantile(summary, 0.9))
-    show.(name, Map.put(labels, "quantile", "0.99"), quantile(summary, 0.99))
-    
-    show.("#{name}_sum",   labels, summary.sum)
-    show.("#{name}_total", labels, summary.total)
-  end
 end
