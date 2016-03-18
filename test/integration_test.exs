@@ -6,8 +6,14 @@ defmodule IntegrationTest do
   @moduletag timeout: :infinity
   
   defp cmd(name, args, opts \\ []) do
+    {allow_fail, opts} = opts |> Keyword.pop(:allow_fail)
+    
     {io, code} = System.cmd(name, args, opts)
-    {:exit_code, 0} = {:exit_code, code}
+    
+    unless allow_fail do
+      {:exit_code, 0} = {:exit_code, code}
+    end
+    
     io
   end
   
@@ -47,7 +53,8 @@ defmodule IntegrationTest do
     cmd "docker", ~w(build -t local/test-promenade .), into: stdio
     
     Task.start_link fn ->
-      cmd "docker", ~w(run --name #{c_id} local/test-promenade), into: stdio
+      cmd "docker", ~w(run --name #{c_id} local/test-promenade),
+        into: stdio, allow_fail: true
     end
     
     :timer.sleep(5_000) # wait for container to start
