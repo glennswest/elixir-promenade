@@ -65,6 +65,15 @@ defmodule IntegrationTest do
     Logger.info("fetching empty initial metrics from HTTP")
     assert curl_metrics(c_ip) == [""]
     
+    Logger.info("sending some invalid metrics over UDP - should not crash")
+    [
+      "nope",
+      "nope:88|ms",
+    ]
+    |> send_metrics(c_ip)
+    
+    :timer.sleep(1_000) # wait for service to process the metrics
+    
     Logger.info("sending some seed metrics over UDP")
     [
       "foo:88|g",
