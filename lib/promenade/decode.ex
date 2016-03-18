@@ -1,10 +1,12 @@
 
 defmodule Promenade.Decode do
+  require Logger
   
   def packet(input) do
     input
     |> String.split("\n", trim: true)
     |> Enum.map(&(line(&1)))
+    |> Enum.filter(&(&1))
   end
   
   def line(input) do
@@ -32,7 +34,9 @@ defmodule Promenade.Decode do
       
       {suffix, name, value, labels}
     rescue e ->
-      e |> Promenade.Util.reraise_prefixed("Error parsing line: #{input}")
+      Logger.warn "Couldn't decode line: #{input}"
+      Logger.warn Exception.format(:error, e, System.stacktrace)
+      nil
     end
   end
   
