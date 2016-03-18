@@ -1,6 +1,7 @@
 
 defmodule IntegrationTest do
   use ExUnit.Case
+  require Logger
   
   @moduletag external: true
   @moduletag timeout: :infinity
@@ -35,7 +36,7 @@ defmodule IntegrationTest do
   end
   
   defp curl_metrics(ip) do
-    cmd("curl", ["http://#{ip}:8080/metrics"])
+    cmd("curl", ["--silent", "http://#{ip}:8080/metrics"])
     |> String.strip
     |> String.split("\n")
   end
@@ -61,8 +62,10 @@ defmodule IntegrationTest do
     
     c_ip = get_docker_ip(c_id)
     
+    Logger.info("fetching empty initial metrics from HTTP")
     assert curl_metrics(c_ip) == [""]
     
+    Logger.info("sending some seed metrics over UDP")
     [
       "foo:88|g",
       "bar:99|c",
@@ -72,6 +75,7 @@ defmodule IntegrationTest do
     
     :timer.sleep(1_000) # wait for service to process the metrics
     
+    Logger.info("fetching result metrics from HTTP")
     assert curl_metrics(c_ip) == [
       "# TYPE foo gauge",
       "foo 88.0",
