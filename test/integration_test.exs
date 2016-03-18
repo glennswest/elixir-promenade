@@ -79,5 +79,7 @@ defmodule IntegrationTest do
       "baz_sum 1.1",
       "baz_total 1"
     ]
+    
+    cmd "docker", ~w(rm -f #{c_id})
   end
 end
