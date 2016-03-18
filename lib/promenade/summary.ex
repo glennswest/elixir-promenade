@@ -4,7 +4,7 @@ defmodule Promenade.Summary do
   
   defstruct \
     qe:    nil,
-    total: 0,
+    count: 0,
     sum:   0.0
   
   # Target 0.5% accuracy for 5th percentile, 2% for 50th percentile, etc.
@@ -19,7 +19,7 @@ defmodule Promenade.Summary do
       |> :quantile_estimator.f_targeted
       |> :quantile_estimator.new
     
-    %Summary { qe: qe, total: 0, sum: 0.0 }
+    %Summary { qe: qe, count: 0, sum: 0.0 }
     |> observe(value)
   end
   
@@ -27,17 +27,17 @@ defmodule Promenade.Summary do
     %{} |> Map.put(labels, new(labels, value))
   end
   
-  def observe(%Summary { qe: qe, total: total, sum: sum }, value) do
+  def observe(%Summary { qe: qe, count: count, sum: sum }, value) do
     qe = :quantile_estimator.insert(value, qe)
     
     if :quantile_estimator.inserts_since_compression(qe) >= @compress_rate do
       qe = :quantile_estimator.compress(qe)
     end
     
-    %Summary { qe: qe, total: total + 1, sum: sum + value }
+    %Summary { qe: qe, count: count + 1, sum: sum + value }
   end
   
   def quantile(summary, q), do: :quantile_estimator.quantile(q, summary.qe)
-  def total(summary),       do: summary.total
+  def count(summary),       do: summary.count
   def sum(summary),         do: summary.sum
 end

@@ -43,7 +43,7 @@ defmodule Promenade.RegistryTest do
       |> Map.get("baz")
       |> Map.get(%{ "x" => "XXX" })
     
-    assert Promenade.Summary.total(summary)          == 1
+    assert Promenade.Summary.count(summary)          == 1
     assert Promenade.Summary.sum(summary)            == 5.5
     assert Promenade.Summary.quantile(summary, 0.5)  == 5.5
     assert Promenade.Summary.quantile(summary, 0.9)  == 5.5
@@ -93,7 +93,7 @@ defmodule Promenade.RegistryTest do
       |> Map.get("baz")
       |> Map.get(%{ "x" => "XXX" })
     
-    assert Promenade.Summary.total(summary)          == 10
+    assert Promenade.Summary.count(summary)          == 10
     assert Promenade.Summary.sum(summary)            == 333.3
     assert Promenade.Summary.quantile(summary, 0.5)  == 33.3
     assert Promenade.Summary.quantile(summary, 0.9)  == 100

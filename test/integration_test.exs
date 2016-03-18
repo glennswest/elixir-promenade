@@ -88,7 +88,7 @@ defmodule IntegrationTest do
       "baz{quantile=\"0.9\"} 1.1",
       "baz{quantile=\"0.99\"} 1.1",
       "baz_sum 1.1",
-      "baz_total 1"
+      "baz_count 1"
     ]
     
     cmd "docker", ~w(rm -f #{c_id})

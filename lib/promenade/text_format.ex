@@ -29,7 +29,7 @@ defmodule Promenade.TextFormat do
     <> entry(nil, name, Map.put(labels, ql, "0.9"),  Summary.quantile(s, 0.9))
     <> entry(nil, name, Map.put(labels, ql, "0.99"), Summary.quantile(s, 0.99))
     <> entry(nil, "#{name}_sum",   labels, Summary.sum(s))
-    <> entry(nil, "#{name}_total", labels, Summary.total(s))
+    <> entry(nil, "#{name}_count", labels, Summary.count(s))
   end
   
   def entry(_, name, labels, value) do

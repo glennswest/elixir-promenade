@@ -55,19 +55,19 @@ baz{quantile="0.5",x="XXX"} 5.5
 baz{quantile="0.9",x="XXX"} 5.5
 baz{quantile="0.99",x="XXX"} 5.5
 baz_sum{x="XXX"} 5.5
-baz_total{x="XXX"} 1
+baz_count{x="XXX"} 1
 baz{quantile="0.5",y="YYY"} 6.6
 baz{quantile="0.9",y="YYY"} 6.6
 baz{quantile="0.99",y="YYY"} 6.6
 baz_sum{y="YYY"} 6.6
-baz_total{y="YYY"} 1
+baz_count{y="YYY"} 1
 
 # TYPE baz2 summary
 baz2{quantile="0.5",x="XXX",y="YYY"} 3.3
 baz2{quantile="0.9",x="XXX",y="YYY"} 3.3
 baz2{quantile="0.99",x="XXX",y="YYY"} 3.3
 baz2_sum{x="XXX",y="YYY"} 3.3
-baz2_total{x="XXX",y="YYY"} 1
+baz2_count{x="XXX",y="YYY"} 1
 """
   end
 end
