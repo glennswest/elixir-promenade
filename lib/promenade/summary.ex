@@ -13,7 +13,7 @@ defmodule Promenade.Summary do
   # Compress data after every 10th observation.
   @compress_rate 10
   
-  def new(_labels, value) do
+  def new(value) do
     qe =
       @f_targets
       |> :quantile_estimator.f_targeted
@@ -24,7 +24,7 @@ defmodule Promenade.Summary do
   end
   
   def new_map(labels, value) do
-    %{} |> Map.put(labels, new(labels, value))
+    %{} |> Map.put(labels, new(value))
   end
   
   def observe(%Summary { qe: qe, count: count, sum: sum }, value) do

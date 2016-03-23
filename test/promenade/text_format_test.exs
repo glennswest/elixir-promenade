@@ -25,11 +25,11 @@ defmodule Promenade.TextFormatTest do
       },
       summaries: %{
         "baz" => %{
-          %{ "x" => "XXX" } => Promenade.Summary.new(%{}, 5.5),
-          %{ "y" => "YYY" } => Promenade.Summary.new(%{}, 6.6),
+          %{ "x" => "XXX" } => Promenade.Summary.new(5.5),
+          %{ "y" => "YYY" } => Promenade.Summary.new(6.6),
         },
         "baz2" => %{
-          %{ "x" => "XXX", "y" => "YYY" } => Promenade.Summary.new(%{}, 3.3),
+          %{ "x" => "XXX", "y" => "YYY" } => Promenade.Summary.new(3.3),
         },
       },
     }
