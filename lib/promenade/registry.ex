@@ -55,7 +55,7 @@ defmodule Promenade.Registry do
   defp handle_metric(state, {:summary, name, value, labels}) do
     %State { state | summaries: state.summaries
       |> Map.update(name, Summary.new_map(labels, value), fn(m) -> m
-        |> Map.update(labels, value, &(&1 |> Summary.observe(value)))
+        |> Map.update(labels, Summary.new(value), &(Summary.observe(&1, value)))
       end)
     }
   end
