@@ -30,4 +30,4 @@ RUN rm -rf /opt/promenade/src && \
 
 # Ready to roll
 WORKDIR /opt/promenade
-CMD bin/promenade foreground
+CMD trap exit TERM; bin/promenade foreground & wait
