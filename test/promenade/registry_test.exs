@@ -76,27 +76,32 @@ defmodule Promenade.RegistryTest do
       },
     }
     
-    Promenade.Registry.handle_metrics subject, [
-      {:summary, "baz", 1.1,  %{ "x" => "XXX" }},
-      {:summary, "baz", 2.2,  %{ "x" => "XXX" }},
-      {:summary, "baz", 3.3,  %{ "x" => "XXX" }},
-      {:summary, "baz", 10.1, %{ "x" => "XXX" }},
-      {:summary, "baz", 100,  %{ "x" => "XXX" }},
-      {:summary, "baz", 88.8, %{ "x" => "XXX" }},
-      {:summary, "baz", 43.5, %{ "x" => "XXX" }},
-      {:summary, "baz", 45.5, %{ "x" => "XXX" }},
-      {:summary, "baz", 33.3, %{ "x" => "XXX" }},
-    ]
-    
-    summary =
-      Promenade.Registry.get_state(subject).summaries
-      |> Map.get("baz")
-      |> Map.get(%{ "x" => "XXX" })
-    
-    assert Promenade.Summary.count(summary)          == 10
-    assert Promenade.Summary.sum(summary)            == 333.3
-    assert Promenade.Summary.quantile(summary, 0.5)  == 33.3
-    assert Promenade.Summary.quantile(summary, 0.9)  == 100
-    assert Promenade.Summary.quantile(summary, 0.99) == 100
+    ["baz1", "baz2"] |> Enum.each fn(name) ->
+      [%{ "x" => "XXX" }, %{ "y" => "YYY" }] |> Enum.each fn(labels) ->
+        Promenade.Registry.handle_metrics subject, [
+          {:summary, name, 5.5,  labels},
+          {:summary, name, 1.1,  labels},
+          {:summary, name, 2.2,  labels},
+          {:summary, name, 3.3,  labels},
+          {:summary, name, 10.1, labels},
+          {:summary, name, 100,  labels},
+          {:summary, name, 88.8, labels},
+          {:summary, name, 43.5, labels},
+          {:summary, name, 45.5, labels},
+          {:summary, name, 33.3, labels},
+        ]
+        
+        summary =
+          Promenade.Registry.get_state(subject).summaries
+          |> Map.get(name)
+          |> Map.get(labels)
+        
+        assert Promenade.Summary.count(summary)          == 10
+        assert Promenade.Summary.sum(summary)            == 333.3
+        assert Promenade.Summary.quantile(summary, 0.5)  == 33.3
+        assert Promenade.Summary.quantile(summary, 0.9)  == 100
+        assert Promenade.Summary.quantile(summary, 0.99) == 100
+      end
+    end
   end
 end
