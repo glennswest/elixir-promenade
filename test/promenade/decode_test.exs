@@ -58,6 +58,11 @@ defmodule Promenade.DecodeTest do
       == {:gauge, "foo", 88.8, %{}}
   end
   
+  test "line parses a line with tricky characters in a label value string" do
+    assert Promenade.Decode.line("foo{trick=\"}{:|\"}:88.8|g")
+      == {:gauge, "foo", 88.8, %{ "trick" => "}{:|" }}
+  end
+  
   test "packet parses some newline-separated lines" do
     assert Promenade.Decode.packet("foo:88.8|g\nbar:99|c\nbaz:11|s\n") == [
       {:gauge, "foo", 88.8, %{}},

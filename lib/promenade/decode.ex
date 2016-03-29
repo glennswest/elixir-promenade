@@ -9,10 +9,12 @@ defmodule Promenade.Decode do
     |> Enum.filter(&(&1))
   end
   
+  @final_colon_pattern ~r/:(?=[^:]*$)/
+  
   def line(input) do
     try do
       {input, suffix} = input |> String.split_at(-2)
-      [name, value]   = input |> String.split(":", parts: 2)
+      [name, value]   = input |> String.split(@final_colon_pattern, parts: 2)
       
       suffix =
         case suffix do
