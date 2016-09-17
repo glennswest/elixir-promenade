@@ -76,8 +76,8 @@ defmodule Promenade.RegistryTest do
       },
     }
     
-    ["baz1", "baz2"] |> Enum.each fn(name) ->
-      [%{ "x" => "XXX" }, %{ "y" => "YYY" }] |> Enum.each fn(labels) ->
+    for name <- ["baz1", "baz2"] do
+      for labels <- [%{ "x" => "XXX" }, %{ "y" => "YYY" }] do
         Promenade.Registry.handle_metrics subject, [
           {:summary, name, 5.5,  labels},
           {:summary, name, 1.1,  labels},
