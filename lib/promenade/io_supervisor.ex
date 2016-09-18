@@ -7,11 +7,10 @@ defmodule Promenade.IoSupervisor do
   end
   
   def init(opts) do
-    registry = opts |> Keyword.fetch!(:registry)
-    modules  = opts |> Keyword.fetch!(:modules)
+    {modules, opts} = opts |> Keyword.pop(:modules)
     
     modules
-    |> Enum.map(&(worker(&1, [&1, registry])))
+    |> Enum.map(&(worker(&1, [&1, opts])))
     |> supervise(strategy: :one_for_one)
   end
 end

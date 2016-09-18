@@ -3,38 +3,38 @@ defmodule Promenade.TextFormatTest do
   use ExUnit.Case
   doctest Promenade.Registry
   
-  test "accumulates metrics into its state" do
-    state = %Promenade.Registry.State {
-      gauges: %{
-        "foo" => %{
+  test "prints formatted metrics from table data" do
+    data = {
+      [
+        {"foo", %{
           %{ "x" => "XXX" } => 77.7,
           %{ "y" => "YYY" } => 44.4,
-        },
-        "foo2" => %{
+        }},
+        {"foo2", %{
           %{ "x" => "XXX", "y" => "YYY" } => 33.3
-        },
-      },
-      counters: %{
-        "bar" => %{
+        }},
+      ],
+      [
+        {"bar", %{
           %{ "x" => "XXX" } => 222,
           %{ "y" => "YYY" } => 33,
-        },
-        "bar2" => %{
+        }},
+        {"bar2", %{
           %{ "x" => "XXX", "y" => "YYY" } => 111
-        },
-      },
-      summaries: %{
-        "baz" => %{
+        }},
+      ],
+      [
+        {"baz", %{
           %{ "x" => "XXX" } => Promenade.Summary.new(5.5),
           %{ "y" => "YYY" } => Promenade.Summary.new(6.6),
-        },
-        "baz2" => %{
+        }},
+        {"baz2", %{
           %{ "x" => "XXX", "y" => "YYY" } => Promenade.Summary.new(3.3),
-        },
-      },
+        }},
+      ],
     }
     
-    assert Promenade.TextFormat.snapshot(state) ==
+    assert Promenade.TextFormat.snapshot(data) ==
 """
 # TYPE foo gauge
 foo{x="XXX"} 77.7

@@ -18,30 +18,30 @@ defmodule Promenade.RegistryTest do
       {:summary, "baz", 5.5, %{ "x" => "XXX" }},
     ]
     
-    assert Promenade.Registry.get_state(subject).gauges == %{
-      "foo" => %{
+    {gauges, counters, summaries} =
+      subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+    
+    assert Enum.sort(gauges) == [
+      {"foo", %{
         %{ "x" => "XXX" } => 88.8,
         %{ "y" => "YYY" } => 44.4,
-      },
-      "foo2" => %{
+      }},
+      {"foo2", %{
         %{ "x" => "XXX", "y" => "YYY" } => 22.2
-      },
-    }
+      }},
+    ]
     
-    assert Promenade.Registry.get_state(subject).counters == %{
-      "bar" => %{
+    assert Enum.sort(counters) == [
+      {"bar", %{
         %{ "x" => "XXX" } => 99,
         %{ "y" => "YYY" } => 33,
-      },
-      "bar2" => %{
+      }},
+      {"bar2", %{
         %{ "x" => "XXX", "y" => "YYY" } => 11
-      },
-    }
+      }},
+    ]
     
-    summary =
-      Promenade.Registry.get_state(subject).summaries
-      |> Map.get("baz")
-      |> Map.get(%{ "x" => "XXX" })
+    summary = Map.new(summaries) |> Map.get("baz") |> Map.get(%{ "x" => "XXX" })
     
     assert Promenade.Summary.count(summary)          == 1
     assert Promenade.Summary.sum(summary)            == 5.5
@@ -56,25 +56,28 @@ defmodule Promenade.RegistryTest do
       {:counter, "bar2", 100, %{ "x" => "XXX", "y" => "YYY" }},
     ]
     
-    assert Promenade.Registry.get_state(subject).gauges == %{
-      "foo" => %{
+    {gauges, counters, _summaries} =
+      subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+    
+    assert Enum.sort(gauges) == [
+      {"foo", %{
         %{ "x" => "XXX" } => 77.7,
         %{ "y" => "YYY" } => 44.4,
-      },
-      "foo2" => %{
+      }},
+      {"foo2", %{
         %{ "x" => "XXX", "y" => "YYY" } => 33.3
-      },
-    }
+      }},
+    ]
     
-    assert Promenade.Registry.get_state(subject).counters == %{
-      "bar" => %{
+    assert Enum.sort(counters) == [
+      {"bar", %{
         %{ "x" => "XXX" } => 222,
         %{ "y" => "YYY" } => 33,
-      },
-      "bar2" => %{
+      }},
+      {"bar2", %{
         %{ "x" => "XXX", "y" => "YYY" } => 111
-      },
-    }
+      }},
+    ]
     
     for name <- ["baz1", "baz2"] do
       for labels <- [%{ "x" => "XXX" }, %{ "y" => "YYY" }] do
@@ -91,10 +94,10 @@ defmodule Promenade.RegistryTest do
           {:summary, name, 33.3, labels},
         ]
         
-        summary =
-          Promenade.Registry.get_state(subject).summaries
-          |> Map.get(name)
-          |> Map.get(labels)
+        {_gauges, _counters, summaries} =
+          subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+        
+        summary = Map.new(summaries) |> Map.get(name) |> Map.get(labels)
         
         assert Promenade.Summary.count(summary)          == 10
         assert Promenade.Summary.sum(summary)            == 333.3
