@@ -20,7 +20,7 @@ dependencies:
     - asdf plugin-add elixir https://github.com/HashNuke/asdf-elixir.git || echo okay...
     - echo -e "erlang $ERLANG_VERSION\nelixir $ELIXIR_VERSION\n" > .tool-versions
     - asdf install
-    - mix do local.hex --force, hex.info, local.rebar, deps.get, deps.compile
+    - mix do local.hex --force, hex.info, local.rebar --force, deps.get, deps.compile
 
 test:
   override:
