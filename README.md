@@ -1,5 +1,8 @@
 # Promenade
 
+[![CI Status](https://circleci.com/gh/jemc/elixir-promenade.svg?style=shield)](https://circleci.com/gh/jemc/elixir-promenade)
+[![Deps Status](https://beta.hexfaktor.org/badge/all/github/jemc/elixir-promenade.svg)](https://beta.hexfaktor.org/github/jemc/elixir-promenade)
+
 A metrics forwarder for Prometheus that accepts UDP input in a format similar to StatsD, but with support for the proper Prometheus data model, including labels.
 
 Conceptually, this is a best-of-both-worlds between the [official Prometheus StatsD Exporter](https://github.com/prometheus/statsd_exporter) (which does not support the proper Prometheus data model) and the [official Prometheus Push Gateway](https://github.com/prometheus/pushgateway) (which supports only synchronous HTTP input and has a limited jobs-based orientation).
