@@ -16,8 +16,8 @@ dependencies:
     - ~/.asdf
   pre:
     - if ! asdf | grep version; then git clone https://github.com/HashNuke/asdf.git ~/.asdf; fi
-    - asdf plugin-add erlang https://github.com/HashNuke/asdf-erlang.git
-    - asdf plugin-add elixir https://github.com/HashNuke/asdf-elixir.git
+    - asdf plugin-add erlang https://github.com/HashNuke/asdf-erlang.git || echo okay...
+    - asdf plugin-add elixir https://github.com/HashNuke/asdf-elixir.git || echo okay...
     - echo -e "erlang $ERLANG_VERSION\nelixir $ELIXIR_VERSION\n" > .tool-versions
     - asdf install
     - mix do local.hex --force, hex.info, local.rebar, deps.get, deps.compile
