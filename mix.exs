@@ -43,8 +43,8 @@ defmodule Promenade.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
+      {:exactor, "~> 2.2.0", warn_missing: false},
       exrm: "~> 1.0.2",
-      exactor: "~> 2.2.0",
       plug: "~> 1.1.2",
       cowboy: "~> 1.0.0",
       quantile_estimator: [
