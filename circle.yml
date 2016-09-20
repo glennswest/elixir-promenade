@@ -1,9 +1,15 @@
+machine:
+  pre:
+    # Use Docker 1.10:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  services:
+    - docker
 
 machine:
   environment:
     PATH: "$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
     ERLANG_VERSION: "18.2.1"
-    ELIXIR_VERSION:  "1.1.1"
+    ELIXIR_VERSION:  "1.3.3"
 
 dependencies:
   cache_directories:
@@ -19,3 +25,6 @@ dependencies:
 test:
   override:
     - mix test --no-start
+  post:
+    - mix archive.install https://git.io/edib-0.8.1.ez --force
+    - mix edib --no-rm
