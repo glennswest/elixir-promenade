@@ -4,24 +4,22 @@ defmodule Promenade.HttpServer do
   import Plug.Conn
   
   def port, do: Application.fetch_env!(:promenade, :http_port)
-  def start_link(name, registry) do
+  def start_link(name, opts) do
     # TODO: make this actually linked
     Logger.info("#{inspect name} serving HTTP requests on port #{port}")
     
-    Plug.Adapters.Cowboy.http(__MODULE__, [registry: registry], port: port)
+    Plug.Adapters.Cowboy.http(__MODULE__, opts, port: port)
   end
   
   def init(opts) do
-    opts |> Keyword.fetch!(:registry)
-    
     opts
   end
   
   def call(conn, opts) do
     text =
       opts
-      |> Keyword.fetch!(:registry)
-      |> Promenade.Registry.get_state
+      |> Keyword.fetch!(:tables)
+      |> Promenade.Registry.data
       |> Promenade.TextFormat.snapshot
     
     conn

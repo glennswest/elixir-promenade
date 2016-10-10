@@ -2,10 +2,10 @@
 defmodule Promenade.TextFormat do
   alias Promenade.Summary
   
-  def snapshot(%Promenade.Registry.State{} = state) do
-    section(:gauge,   state.gauges)   <> "\n" <>
-    section(:counter, state.counters) <> "\n" <>
-    section(:summary, state.summaries)
+  def snapshot({gauges, counters, summaries}) do
+    section(:gauge,   gauges)   <> "\n" <>
+    section(:counter, counters) <> "\n" <>
+    section(:summary, summaries)
   end
   
   def section(type, metrics) do

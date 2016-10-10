@@ -8,7 +8,9 @@ defmodule Promenade.UdpListener do
   
   def start_link(a, b), do: Task.start_link fn -> run(a, b) end
   
-  def run(name, registry) do
+  def run(name, opts) do
+    registry = opts |> Keyword.fetch!(:registry)
+    
     Process.register(self, name)
     Logger.info("#{inspect name} listening for UDP input on port #{port}")
     

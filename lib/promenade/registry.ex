@@ -3,13 +3,6 @@ defmodule Promenade.Registry do
   use ExActor.GenServer
   require Logger
   
-  defmodule State do
-    defstruct \
-      gauges: %{},
-      counters: %{},
-      summaries: %{}
-  end
-  
   alias Promenade.Summary
   
   def start_link(name, io_modules) do
@@ -17,15 +10,28 @@ defmodule Promenade.Registry do
   end
   
   def init(io_modules) do
+    tables = {
+      :ets.new(:gauges,    []),
+      :ets.new(:counters,  []),
+      :ets.new(:summaries, []),
+    }
+    
     Promenade.IoSupervisor.start_link(Promenade.IoSupervisor,
       registry: self,
-      modules: io_modules
+      tables:   tables,
+      modules:  io_modules,
     )
     
-    initial_state %State{}
+    initial_state tables
   end
   
-  defcall get_state, state: state, do: reply state
+  def data({gauges, counters, summaries}) do
+    {gauges    |> :ets.tab2list(),
+     counters  |> :ets.tab2list(),
+     summaries |> :ets.tab2list()}
+  end
+  
+  defcall get_tables, state: state, do: reply state
   
   defcast handle_metrics(metrics), state: state do
     new_state handle_metrics_(state, metrics)
@@ -36,31 +42,36 @@ defmodule Promenade.Registry do
     state |> handle_metric(first) |> handle_metrics_(rest)
   end
   
-  defp handle_metric(state, {:gauge, name, value, labels}) do
-    %State { state | gauges: state.gauges
-      |> Map.update(name, new_map(labels, value), fn(m) -> m
-        |> Map.put(labels, value)
-      end)
-    }
+  defp handle_metric(state = {table, _, _}, {:gauge, name, value, labels}) do
+    unless table |> :ets.insert_new({name, %{} |> Map.put(labels, value)}) do
+      map = table
+            |> :ets.lookup_element(name, 2)
+            |> Map.put(labels, value)
+      table |> :ets.insert({name, map})
+    end
+    
+    state
   end
   
-  defp handle_metric(state, {:counter, name, value, labels}) do
-    %State { state | counters: state.counters
-      |> Map.update(name, new_map(labels, value), fn(m) -> m
-        |> Map.update(labels, value, &(&1 + value))
-      end)
-    }
+  defp handle_metric(state = {_, table, _}, {:counter, name, value, labels}) do
+    unless table |> :ets.insert_new({name, %{} |> Map.put(labels, value)}) do
+      map = table
+            |> :ets.lookup_element(name, 2)
+            |> Map.update(labels, value, &(&1 + value))
+      table |> :ets.insert({name, map})
+    end
+    
+    state
   end
   
-  defp handle_metric(state, {:summary, name, value, labels}) do
-    %State { state | summaries: state.summaries
-      |> Map.update(name, Summary.new_map(labels, value), fn(m) -> m
-        |> Map.update(labels, Summary.new(value), &(Summary.observe(&1, value)))
-      end)
-    }
-  end
-  
-  defp new_map(key, value) do
-    %{} |> Map.put(key, value)
+  defp handle_metric(state = {_, _, table}, {:summary, name, value, labels}) do
+    unless table |> :ets.insert_new({name, %{} |> Map.put(labels, Summary.new(value))}) do
+      map = table
+            |> :ets.lookup_element(name, 2)
+            |> Map.update(labels, Summary.new(value), &(Summary.observe(&1, value)))
+      table |> :ets.insert({name, map})
+    end
+    
+    state
   end
 end
