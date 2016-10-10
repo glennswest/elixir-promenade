@@ -1,14 +1,9 @@
 machine:
   pre:
     # Use Docker 1.10:
-    - sudo curl -L -o /usr/bin/docker 'https://s3-external-1.amazonaws.com/circle-downloads/docker-1.10.0-circleci'
-    - echo 'DOCKER_OPTS="-s btrfs -D"' | sudo tee /etc/default/docker
-    - echo 'env container=yes' | sudo tee -a /etc/init/docker.conf
-
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
   services:
     - docker
-
-machine:
   environment:
     PATH: "$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
     ERLANG_VERSION: "18.2.1"
