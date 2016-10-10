@@ -1,4 +1,4 @@
-FROM alpine:3.3
+FROM alpine:3.4
 
 # Expose the default UDP input port and HTTP output port (respectively)
 EXPOSE 8126

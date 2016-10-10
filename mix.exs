@@ -6,7 +6,7 @@ defmodule Promenade.Mixfile do
     [
       app: :promenade,
       version: "0.1.6",
-      elixir: "~> 1.1",
+      elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
@@ -45,7 +45,7 @@ defmodule Promenade.Mixfile do
     [
       {:exactor, "~> 2.2.0", warn_missing: false},
       exrm: "~> 1.0.2",
-      plug: "~> 1.1.2",
+      plug: "~> 1.2.2",
       cowboy: "~> 1.0.0",
       quantile_estimator: [
         git: "https://github.com/jemc/quantile_estimator.git",
