@@ -20,6 +20,14 @@ defmodule Promenade.HttpServerTest do
     |> HttpServer.call(registry: registry, tables: tables)
   end
   
+  test "/status" do
+    conn = call(:get, "/status")
+    
+    assert conn.state     == :sent
+    assert conn.status    == 200
+    assert conn.resp_body == ""
+  end
+  
   test "/metrics" do
     registry |> Registry.handle_metrics [
       {:gauge, "foo", 88.8, %{ "x" => "XXX" }},

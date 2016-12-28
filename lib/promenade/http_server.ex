@@ -16,6 +16,10 @@ defmodule Promenade.HttpServer do
   
   def init(opts), do: opts
   
+  def call(conn = %Plug.Conn { path_info: ["status"] }, opts) do
+    conn |> respond(200, "")
+  end
+  
   def call(conn, opts) do
     text =
       opts

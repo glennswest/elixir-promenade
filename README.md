@@ -46,6 +46,20 @@ More generally, a metric line should consist of:
 * followed by a pipe character (`|`)
 * followed by a single "suffix" character that corresponds to the [metric type](#metric-types) (`g`, `c`, or `s`).
 
+## Scraping Metrics from Promenade over HTTP
+
+Just like with every other Prometheus exporter, metrics are scraped from Promenade via periodic HTTP requests. The default HTTP server port is `8080`.
+
+When a `GET` request is sent to the `/metrics` route of the HTTP server, the format of the HTTP response body will be the standard [Prometheus text format](https://prometheus.io/docs/instrumenting/exposition_formats/#text-format-details). That is, each HTTP response will look like the following, with a `Content-Type` of `text/plain`:
+
+```
+# TYPE my_metric_name gauge
+my_metric_name{} 88.8
+my_metric_name{label1="FOO",label2="bar"} 44.4
+```
+
+The HTTP server also exposes a `/status` route, which will always respond with status code `200` and an empty body when the service is running. This route is intended to be used as a general health check.
+
 ### Metric Types (by suffix)
 
 * `|g` - [Gauge](https://prometheus.io/docs/concepts/metric_types/#gauge) - an instantaneous measurement of the definitive, absolute value of something.
