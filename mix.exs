@@ -35,7 +35,7 @@ defmodule Promenade.Mixfile do
       {:distillery, "~> 0.10.0"},
       {:flasked,    "~> 0.4.0"},
       {:exactor,    "~> 2.2.0", warn_missing: false},
-      {:plug,       "~> 1.2.2"},
+      {:plug,       "~> 1.3.0"},
       {:cowboy,     "~> 1.0.0"},
       {:quantile_estimator,
         git: "https://github.com/jemc/quantile_estimator.git",
