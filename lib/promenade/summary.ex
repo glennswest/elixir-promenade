@@ -30,9 +30,12 @@ defmodule Promenade.Summary do
   def observe(%Summary { qe: qe, count: count, sum: sum }, value) do
     qe = :quantile_estimator.insert(value, qe)
     
-    if :quantile_estimator.inserts_since_compression(qe) >= @compress_rate do
-      qe = :quantile_estimator.compress(qe)
-    end
+    qe =
+      if :quantile_estimator.inserts_since_compression(qe) >= @compress_rate do
+        :quantile_estimator.compress(qe)
+      else
+        qe
+      end
     
     %Summary { qe: qe, count: count + 1, sum: sum + value }
   end
