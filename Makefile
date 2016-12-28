@@ -1,7 +1,10 @@
 .PHONY: release
 
-version ?= $(shell mix run --no-start -e 'IO.puts Mix.Project.config[:version]')
+version ?= $(shell mix compile > /dev/null 2>&1 && mix run --no-start -e 'IO.puts Mix.Project.config[:version]')
 image   ?= jemc/promenade
+
+version:
+	@echo $(version)
 
 release: $(foreach path, mix.exs mix.lock lib rel config priv, $(shell find $(path)))
 	docker run --rm \
