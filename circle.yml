@@ -23,6 +23,3 @@ dependencies:
 test:
   override:
     - mix test --include external:true
-  post:
-    - mix archive.install https://git.io/edib-0.8.1.ez --force
-    - mix edib --no-rm
