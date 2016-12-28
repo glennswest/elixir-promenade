@@ -17,6 +17,7 @@ defmodule Promenade.Mixfile do
     [
       applications: [
         :logger,
+        :flasked,
         :plug,
         :cowboy,
         :quantile_estimator
@@ -31,10 +32,11 @@ defmodule Promenade.Mixfile do
 
   defp deps do
     [
-      {:exrm, "~> 1.0.2"},
-      {:exactor, "~> 2.2.0", warn_missing: false},
-      {:plug, "~> 1.2.2"},
-      {:cowboy, "~> 1.0.0"},
+      {:distillery, "~> 0.10.0"},
+      {:flasked,    "~> 0.4.0"},
+      {:exactor,    "~> 2.2.0", warn_missing: false},
+      {:plug,       "~> 1.2.2"},
+      {:cowboy,     "~> 1.0.0"},
       {:quantile_estimator,
         git: "https://github.com/jemc/quantile_estimator.git",
         sha: "37f4d6cc5808dc6c571563c3b76ca1a71b7cff3e",

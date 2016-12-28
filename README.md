@@ -19,7 +19,7 @@ Promenade is suitable for:
 
 ## Running Promenade
 
-In many cases, the easiest way to run Promenade as a standalone service is with Docker, for which [an official image is provided as an automated build](https://hub.docker.com/r/jemc/promenade):
+In many cases, the easiest way to run Promenade as a standalone service is with Docker, for which [an official image is provided](https://hub.docker.com/r/jemc/promenade):
 
 ```shell
 # Run promenade, exposing the UDP input on port 8126 and HTTP output on 8080.
@@ -52,3 +52,10 @@ More generally, a metric line should consist of:
 * `|c` - [Counter](https://prometheus.io/docs/concepts/metric_types/#counter) - a measurement of the relative increase of something.
 * `|s` - [Summary](https://prometheus.io/docs/concepts/metric_types/#summary) - a single sample measurement from a distribution of samples of something.
 * `|h` - [Histogram](https://prometheus.io/docs/concepts/metric_types/#histogram) - *NOT YET SUPPORTED*.
+
+## Environment Variables
+
+Promenade responds to a number of environment variables for configuration:
+
+- `PROMENADE_UDP_PORT` - the UDP port to listen on (default: `8126`).
+- `PROMENADE_HTTP_PORT` - the HTTP port to listen on (default: `8080`).

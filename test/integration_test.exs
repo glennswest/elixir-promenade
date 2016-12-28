@@ -51,7 +51,7 @@ defmodule IntegrationTest do
     c_id  = random_id
     stdio = IO.stream(:stdio, :line)
     
-    cmd "docker", ~w(build -t local/test-promenade .), into: stdio
+    cmd "make", ~w(release image=local/test-promenade), into: stdio
     
     Task.start_link fn ->
       cmd "docker", ~w(run --name #{c_id} local/test-promenade),
