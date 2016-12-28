@@ -26,12 +26,26 @@ defmodule Promenade.Registry do
   end
   
   def data({gauges, counters, summaries}) do
-    {gauges    |> :ets.tab2list(),
-     counters  |> :ets.tab2list(),
-     summaries |> :ets.tab2list()}
+    {
+      gauges    |> :ets.tab2list,
+      counters  |> :ets.tab2list,
+      summaries |> :ets.tab2list,
+    }
+  end
+  
+  defp clear({gauges, counters, summaries}) do
+    gauges    |> :ets.delete_all_objects
+    counters  |> :ets.delete_all_objects
+    summaries |> :ets.delete_all_objects
   end
   
   defcall get_tables, state: state, do: reply state
+  
+  defcall flush_data, state: state do
+    data = data(state)
+    clear(state)
+    reply data
+  end
   
   defcast handle_metrics(metrics), state: state do
     new_state handle_metrics_(state, metrics)

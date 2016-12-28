@@ -106,5 +106,32 @@ defmodule Promenade.RegistryTest do
         assert Promenade.Summary.quantile(summary, 0.99) == 100
       end
     end
+    
+    # Flush data from the registry and confirm that it is emptied.
+    current_data =
+      subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+    
+    assert (subject |> Promenade.Registry.flush_data) == current_data
+    assert (subject |> Promenade.Registry.flush_data) == {[], [], []}
+    
+    # Confirm that new metrics can be accumulated after clearing the tables.
+    Promenade.Registry.handle_metrics subject, [
+      {:gauge, "new_foo", 88.8, %{ "x" => "XXX" }},
+      {:gauge, "new_foo", 44.4, %{ "y" => "YYY" }},
+      {:gauge, "new_foo2", 22.2, %{ "x" => "XXX", "y" => "YYY" }},
+    ]
+    
+    {gauges, _counters, _summaries} =
+      subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+    
+    assert Enum.sort(gauges) == [
+      {"new_foo", %{
+        %{ "x" => "XXX" } => 88.8,
+        %{ "y" => "YYY" } => 44.4,
+      }},
+      {"new_foo2", %{
+        %{ "x" => "XXX", "y" => "YYY" } => 22.2
+      }},
+    ]
   end
 end

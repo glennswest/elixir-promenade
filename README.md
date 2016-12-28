@@ -73,3 +73,4 @@ Promenade responds to a number of environment variables for configuration:
 
 - `PROMENADE_UDP_PORT` - the UDP port to listen on (default: `8126`).
 - `PROMENADE_HTTP_PORT` - the HTTP port to listen on (default: `8080`).
+- `PROMENADE_MEMORY_HWM` - the number of megabytes to use as a rough limit for memory consumption; when the limit is surpassed, *all metrics will be cleared* after the next metrics scrape; if zero, *metrics will never be cleared* for the life of the process (default: `0`).

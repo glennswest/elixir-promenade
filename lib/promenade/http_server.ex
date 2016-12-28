@@ -21,13 +21,14 @@ defmodule Promenade.HttpServer do
   end
   
   def call(conn, opts) do
-    text =
-      opts
-      |> Keyword.fetch!(:tables)
-      |> Registry.data
-      |> TextFormat.snapshot
+    data =
+      if Promenade.memory_over_hwm? do
+        opts |> Keyword.fetch!(:registry) |> Registry.flush_data
+      else
+        opts |> Keyword.fetch!(:tables) |> Registry.data
+      end
     
-    conn |> respond(200, text)
+    conn |> respond(200, TextFormat.snapshot(data))
   end
   
   defp respond(conn, code, body) do
