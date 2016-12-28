@@ -1,14 +1,16 @@
 
 defmodule Promenade.RegistryTest do
   use ExUnit.Case
-  doctest Promenade.Registry
   
-  def make_subject, do: ({:ok, s} = Promenade.Registry.start_link(nil, []); s)
+  alias Promenade.Registry
+  alias Promenade.Summary
+  
+  def make_subject, do: ({:ok, s} = Registry.start_link(nil, []); s)
   
   test "accumulates metrics into its state" do
     subject = make_subject
     
-    Promenade.Registry.handle_metrics subject, [
+    Registry.handle_metrics subject, [
       {:gauge, "foo", 88.8, %{ "x" => "XXX" }},
       {:gauge, "foo", 44.4, %{ "y" => "YYY" }},
       {:gauge, "foo2", 22.2, %{ "x" => "XXX", "y" => "YYY" }},
@@ -19,7 +21,7 @@ defmodule Promenade.RegistryTest do
     ]
     
     {gauges, counters, summaries} =
-      subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+      subject |> Registry.get_tables |> Registry.data
     
     assert Enum.sort(gauges) == [
       {"foo", %{
@@ -43,13 +45,13 @@ defmodule Promenade.RegistryTest do
     
     summary = Map.new(summaries) |> Map.get("baz") |> Map.get(%{ "x" => "XXX" })
     
-    assert Promenade.Summary.count(summary)          == 1
-    assert Promenade.Summary.sum(summary)            == 5.5
-    assert Promenade.Summary.quantile(summary, 0.5)  == 5.5
-    assert Promenade.Summary.quantile(summary, 0.9)  == 5.5
-    assert Promenade.Summary.quantile(summary, 0.99) == 5.5
+    assert Summary.count(summary)          == 1
+    assert Summary.sum(summary)            == 5.5
+    assert Summary.quantile(summary, 0.5)  == 5.5
+    assert Summary.quantile(summary, 0.9)  == 5.5
+    assert Summary.quantile(summary, 0.99) == 5.5
     
-    Promenade.Registry.handle_metrics subject, [
+    Registry.handle_metrics subject, [
       {:gauge, "foo", 77.7, %{ "x" => "XXX" }},
       {:gauge, "foo2", 33.3, %{ "x" => "XXX", "y" => "YYY" }},
       {:counter, "bar", 123, %{ "x" => "XXX" }},
@@ -57,7 +59,7 @@ defmodule Promenade.RegistryTest do
     ]
     
     {gauges, counters, _summaries} =
-      subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+      subject |> Registry.get_tables |> Registry.data
     
     assert Enum.sort(gauges) == [
       {"foo", %{
@@ -81,7 +83,7 @@ defmodule Promenade.RegistryTest do
     
     for name <- ["baz1", "baz2"] do
       for labels <- [%{ "x" => "XXX" }, %{ "y" => "YYY" }] do
-        Promenade.Registry.handle_metrics subject, [
+        Registry.handle_metrics subject, [
           {:summary, name, 5.5,  labels},
           {:summary, name, 1.1,  labels},
           {:summary, name, 2.2,  labels},
@@ -95,34 +97,33 @@ defmodule Promenade.RegistryTest do
         ]
         
         {_gauges, _counters, summaries} =
-          subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+          subject |> Registry.get_tables |> Registry.data
         
         summary = Map.new(summaries) |> Map.get(name) |> Map.get(labels)
         
-        assert Promenade.Summary.count(summary)          == 10
-        assert Promenade.Summary.sum(summary)            == 333.3
-        assert Promenade.Summary.quantile(summary, 0.5)  == 33.3
-        assert Promenade.Summary.quantile(summary, 0.9)  == 100
-        assert Promenade.Summary.quantile(summary, 0.99) == 100
+        assert Summary.count(summary)          == 10
+        assert Summary.sum(summary)            == 333.3
+        assert Summary.quantile(summary, 0.5)  == 33.3
+        assert Summary.quantile(summary, 0.9)  == 100
+        assert Summary.quantile(summary, 0.99) == 100
       end
     end
     
     # Flush data from the registry and confirm that it is emptied.
-    current_data =
-      subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+    current_data = subject |> Registry.get_tables |> Registry.data
     
-    assert (subject |> Promenade.Registry.flush_data) == current_data
-    assert (subject |> Promenade.Registry.flush_data) == {[], [], []}
+    assert (subject |> Registry.flush_data) == current_data
+    assert (subject |> Registry.flush_data) == {[], [], []}
     
     # Confirm that new metrics can be accumulated after clearing the tables.
-    Promenade.Registry.handle_metrics subject, [
+    Registry.handle_metrics subject, [
       {:gauge, "new_foo", 88.8, %{ "x" => "XXX" }},
       {:gauge, "new_foo", 44.4, %{ "y" => "YYY" }},
       {:gauge, "new_foo2", 22.2, %{ "x" => "XXX", "y" => "YYY" }},
     ]
     
     {gauges, _counters, _summaries} =
-      subject |> Promenade.Registry.get_tables |> Promenade.Registry.data
+      subject |> Registry.get_tables |> Registry.data
     
     assert Enum.sort(gauges) == [
       {"new_foo", %{

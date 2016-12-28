@@ -1,7 +1,9 @@
 
 defmodule Promenade.UdpListenerTest do
   use ExUnit.Case
-  doctest Promenade.UdpListener
+  
+  alias Promenade.UdpListener
+  alias Promenade.Decode
   
   defmodule MockGenServer do
     use ExActor.GenServer
@@ -36,9 +38,9 @@ defmodule Promenade.UdpListenerTest do
     
     {:ok, mock} = MockGenServer.start_link
     
-    Promenade.UdpListener.handle_packet(mock, socket)
+    UdpListener.handle_packet(mock, socket)
     
-    expected = {:handle_metrics, Promenade.Decode.packet(data)}
+    expected = {:handle_metrics, Decode.packet(data)}
     
     assert MockGenServer.get_last_cast(mock) == expected
   end

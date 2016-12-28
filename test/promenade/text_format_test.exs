@@ -1,7 +1,9 @@
 
 defmodule Promenade.TextFormatTest do
   use ExUnit.Case
-  doctest Promenade.Registry
+  
+  alias Promenade.TextFormat
+  alias Promenade.Summary
   
   test "prints formatted metrics from table data" do
     data = {
@@ -25,16 +27,16 @@ defmodule Promenade.TextFormatTest do
       ],
       [
         {"baz", %{
-          %{ "x" => "XXX" } => Promenade.Summary.new(5.5),
-          %{ "y" => "YYY" } => Promenade.Summary.new(6.6),
+          %{ "x" => "XXX" } => Summary.new(5.5),
+          %{ "y" => "YYY" } => Summary.new(6.6),
         }},
         {"baz2", %{
-          %{ "x" => "XXX", "y" => "YYY" } => Promenade.Summary.new(3.3),
+          %{ "x" => "XXX", "y" => "YYY" } => Summary.new(3.3),
         }},
       ],
     }
     
-    assert Promenade.TextFormat.snapshot(data) ==
+    assert TextFormat.snapshot(data) ==
 """
 # TYPE foo gauge
 foo{x="XXX"} 77.7
