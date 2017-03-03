@@ -8,38 +8,39 @@ defmodule Promenade.TextFormat do
     section(:summary, summaries)
   end
   
-  def section(type, metrics) do
-    metrics
-    |> Enum.map(&(metric(type, elem(&1, 0), elem(&1, 1))))
+  defp section(type, metric_families) do
+    metric_families
+    |> Enum.map(&metric_family(type, &1))
     |> Enum.join("\n")
   end
   
-  def metric(type, name, entries) do
+  defp metric_family(type, {name, metrics}) do
     "# TYPE #{name} #{type}\n" <> (
-      entries
-      |> Enum.map(&(entry(type, name, elem(&1, 0), elem(&1, 1))))
+      metrics
+      |> Enum.map(&metric(type, name, &1))
       |> Enum.join
     )
   end
   
-  def entry(:summary, name, labels, s) do
+  defp metric(:summary, name, {labels, s}) do
     ql = "quantile"
     
-       entry(nil, name, Map.put(labels, ql, "0.5"),  Summary.quantile(s, 0.5))
-    <> entry(nil, name, Map.put(labels, ql, "0.9"),  Summary.quantile(s, 0.9))
-    <> entry(nil, name, Map.put(labels, ql, "0.99"), Summary.quantile(s, 0.99))
-    <> entry(nil, "#{name}_sum",   labels, Summary.sum(s))
-    <> entry(nil, "#{name}_count", labels, Summary.count(s))
+       metric(0, name, {Map.put(labels, ql, "0.5"),  Summary.quantile(s, 0.5)})
+    <> metric(0, name, {Map.put(labels, ql, "0.9"),  Summary.quantile(s, 0.9)})
+    <> metric(0, name, {Map.put(labels, ql, "0.99"), Summary.quantile(s, 0.99)})
+    <> metric(0, "#{name}_sum",   {labels, Summary.sum(s)})
+    <> metric(0, "#{name}_count", {labels, Summary.count(s)})
   end
   
-  def entry(_, name, labels, value) do
+  defp metric(_, name, {labels, value}) do
     "#{name}#{labels_text(labels)} #{value}\n"
   end
   
-  def labels_text(labels) do
-    text = labels
-           |> Enum.map(&("#{elem(&1, 0)}=\"#{elem(&1, 1)}\""))
-           |> Enum.join(",")
+  defp labels_text(labels) do
+    text =
+      labels
+      |> Enum.map(fn {k, v} -> "#{k}=\"#{v}\"" end)
+      |> Enum.join(",")
     
     (text == "") && "" || "{#{text}}"
   end
