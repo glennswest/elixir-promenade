@@ -13,11 +13,11 @@ defmodule Promenade.HttpServerTest do
     pid
   end
   
-  def tables, do: registry |> Registry.get_tables
+  def tables, do: registry() |> Registry.get_tables
   
   def call(method, path) do
     conn(method, path)
-    |> HttpServer.call(registry: registry, tables: tables)
+    |> HttpServer.call(registry: registry(), tables: tables())
   end
   
   test "/status" do
@@ -29,11 +29,11 @@ defmodule Promenade.HttpServerTest do
   end
   
   test "/metrics (no flush - metrics are retained between scrapes)" do
-    Registry.handle_metrics registry, [
+    Registry.handle_metrics registry(), [
       {:gauge, "foo", 88.8, %{ "x" => "XXX" }},
     ]
     
-    expected_body = tables |> Registry.data |> TextFormat.snapshot
+    expected_body = tables() |> Registry.data |> TextFormat.snapshot
     
     conn = call(:get, "/metrics")
     
@@ -49,11 +49,11 @@ defmodule Promenade.HttpServerTest do
   end
   
   test "/metrics (flush due to memory high water mark)" do
-    Registry.handle_metrics registry, [
+    Registry.handle_metrics registry(), [
       {:gauge, "foo", 88.8, %{ "x" => "XXX" }},
     ]
     
-    expected_body = tables |> Registry.data |> TextFormat.snapshot
+    expected_body = tables() |> Registry.data |> TextFormat.snapshot
     
     # Set a very low high water mark that we are surely already above,
     # which will ensure a flush on the next metrics scrape.

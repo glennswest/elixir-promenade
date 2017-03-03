@@ -3,7 +3,7 @@ defmodule Promenade do
   use Application
   
   def start(_type, _opts) do
-    Process.register(self, __MODULE__)
+    Process.register(self(), __MODULE__)
     
     {:ok, _pid} = Promenade.Registry.start_link(Promenade.Registry, [
       Promenade.UdpListener,
@@ -22,7 +22,7 @@ defmodule Promenade do
   def memory_over_hwm? do
     case Application.fetch_env!(:promenade, :memory_hwm) do
       0   -> false
-      hwm -> memory >= hwm
+      hwm -> memory() >= hwm
     end
   end
 end

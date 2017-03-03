@@ -8,7 +8,7 @@ defmodule Promenade.RegistryTest do
   def make_subject, do: ({:ok, s} = Registry.start_link(nil, []); s)
   
   test "accumulates metrics into its state" do
-    subject = make_subject
+    subject = make_subject()
     
     Registry.handle_metrics subject, [
       {:gauge, "foo", 88.8, %{ "x" => "XXX" }},

@@ -17,7 +17,7 @@ defmodule Promenade.Registry do
     }
     
     Promenade.IoSupervisor.start_link(Promenade.IoSupervisor,
-      registry: self,
+      registry: self(),
       tables:   tables,
       modules:  io_modules,
     )

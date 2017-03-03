@@ -31,7 +31,7 @@ defmodule Promenade.UdpListenerTest do
   
   test "handle_packet reads a UDP datagram and forwards it to the registry" do
     data   = "foo:99|g\nbar{label1=\"xxx\",label2=\"yyy\"}:5|c\n"
-    socket = make_udp_socket
+    socket = make_udp_socket()
     {:ok, port} = :inet.port(socket)
     
     udp_send(data, port)

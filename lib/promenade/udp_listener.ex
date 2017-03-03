@@ -4,17 +4,17 @@ defmodule Promenade.UdpListener do
   
   def port,        do: Application.fetch_env!(:promenade, :udp_port)
   def inet_opts,   do: [:binary, active: false]
-  def make_socket, do: ({:ok, s} = :gen_udp.open(port, inet_opts); s)
+  def make_socket, do: ({:ok, s} = :gen_udp.open(port(), inet_opts()); s)
   
   def start_link(a, b), do: Task.start_link fn -> run(a, b) end
   
   def run(name, opts) do
     registry = opts |> Keyword.fetch!(:registry)
     
-    Process.register(self, name)
-    Logger.info("#{inspect name} listening for UDP input on port #{port}")
+    Process.register(self(), name)
+    Logger.info("#{inspect name} listening for UDP input on port #{port()}")
     
-    handle_packets(registry, make_socket)
+    handle_packets(registry, make_socket())
   end
   
   def handle_packets(registry, socket) do

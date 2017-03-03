@@ -48,7 +48,7 @@ defmodule IntegrationTest do
   end
   
   test "builds and runs as a docker container" do
-    c_id  = random_id
+    c_id  = random_id()
     stdio = IO.stream(:stdio, :line)
     
     cmd "make", ~w(release image=local/test-promenade), into: stdio

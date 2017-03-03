@@ -9,9 +9,9 @@ defmodule Promenade.HttpServer do
   def port, do: Application.fetch_env!(:promenade, :http_port)
   def start_link(name, opts) do
     # TODO: make this actually linked
-    Logger.info("#{inspect name} serving HTTP requests on port #{port}")
+    Logger.info("#{inspect name} serving HTTP requests on port #{port()}")
     
-    Plug.Adapters.Cowboy.http(__MODULE__, opts, port: port)
+    Plug.Adapters.Cowboy.http(__MODULE__, opts, port: port())
   end
   
   def init(opts), do: opts

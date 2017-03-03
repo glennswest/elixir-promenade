@@ -1,6 +1,7 @@
 .PHONY: release
 
-version ?= $(shell mix compile > /dev/null 2>&1 && mix run --no-start -e 'IO.puts Mix.Project.config[:version]')
+mix_version = $(shell mix compile > /dev/null 2>&1 && mix run --no-start -e 'IO.puts Mix.Project.config[:version]')
+version ?= $(mix_version)
 image   ?= jemc/promenade
 
 version:
@@ -15,12 +16,12 @@ release: $(foreach path, mix.exs mix.lock lib rel config priv, $(shell find $(pa
 		-v ${PWD}/mix.exs:/source/mix.exs \
 		-v ${PWD}/mix.lock:/source/mix.lock \
 		-v ${PWD}/tarballs:/stage/tarballs \
-		edib/edib-tool:1.4.0
+		edib/edib-tool:1.5.2
 	
 	@# Reset terminal coloring, since edib-tool leaves it as bold green.
 	@tput sgr0 || :
 	
-	cat ${PWD}/tarballs/promenade-$(version).tar.gz | \
+	cat ${PWD}/tarballs/promenade-$(mix_version).tar.gz | \
 		docker import \
 			--change 'WORKDIR /app' \
 			--change 'ENV PATH /app/bin:/bin' \
