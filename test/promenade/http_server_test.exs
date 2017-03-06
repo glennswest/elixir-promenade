@@ -6,6 +6,7 @@ defmodule Promenade.HttpServerTest do
   alias Promenade.HttpServer
   alias Promenade.Registry
   alias Promenade.TextFormat
+  alias Promenade.ProtobufFormat
   
   def registry do
     {:error, {:already_started, pid}} = Registry.start_link(Registry, [])
@@ -20,12 +21,21 @@ defmodule Promenade.HttpServerTest do
     |> HttpServer.call(registry: registry(), tables: tables())
   end
   
+  def call(method, path, accept) do
+    conn(method, path)
+    |> put_req_header("accept", accept)
+    |> HttpServer.call(registry: registry(), tables: tables())
+  end
+  
   test "/status" do
     conn = call(:get, "/status")
     
     assert conn.state     == :sent
     assert conn.status    == 200
     assert conn.resp_body == ""
+    
+    [content_type] = conn |> get_resp_header("content-type")
+    assert content_type =~ ""
   end
   
   test "/metrics (no flush - metrics are retained between scrapes)" do
@@ -41,11 +51,17 @@ defmodule Promenade.HttpServerTest do
     assert conn.status    == 200
     assert conn.resp_body == expected_body
     
+    [content_type] = conn |> get_resp_header("content-type")
+    assert content_type =~ "text/plain"
+    
     conn = call(:get, "/metrics")
     
     assert conn.state     == :sent
     assert conn.status    == 200
     assert conn.resp_body == expected_body
+    
+    [content_type] = conn |> get_resp_header("content-type")
+    assert content_type =~ "text/plain"
   end
   
   test "/metrics (flush due to memory high water mark)" do
@@ -66,6 +82,9 @@ defmodule Promenade.HttpServerTest do
     assert conn.status    == 200
     assert conn.resp_body == expected_body
     
+    [content_type] = conn |> get_resp_header("content-type")
+    assert content_type =~ "text/plain"
+    
     # Reset high water mark.
     Application.put_env(:promenade, :memory_hwm, 0)
     assert !Promenade.memory_over_hwm?
@@ -75,5 +94,30 @@ defmodule Promenade.HttpServerTest do
     assert conn.state     == :sent
     assert conn.status    == 200
     assert conn.resp_body == TextFormat.snapshot({[], [], []})
+    
+    [content_type] = conn |> get_resp_header("content-type")
+    assert content_type =~ "text/plain"
+  end
+  
+  test "/metrics (protobuf format preferred when accepted)" do
+    Registry.handle_metrics registry(), [
+      {:gauge, "foo", 88.8, %{ "x" => "XXX" }},
+    ]
+    
+    expected_body =
+      tables()
+      |> Registry.data
+      |> ProtobufFormat.snapshot
+      |> List.flatten
+      |> Enum.join
+    
+    conn = call(:get, "/metrics", "application/vnd.google.protobuf; text/plain")
+    
+    assert conn.state     == :sent
+    assert conn.status    == 200
+    assert conn.resp_body == expected_body
+    
+    [content_type] = conn |> get_resp_header("content-type")
+    assert content_type =~ "application/vnd.google.protobuf"
   end
 end

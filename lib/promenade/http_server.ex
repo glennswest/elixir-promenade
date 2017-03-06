@@ -5,6 +5,7 @@ defmodule Promenade.HttpServer do
   
   alias Promenade.Registry
   alias Promenade.TextFormat
+  alias Promenade.ProtobufFormat
   
   def port, do: Application.fetch_env!(:promenade, :http_port)
   def start_link(name, opts) do
@@ -17,7 +18,7 @@ defmodule Promenade.HttpServer do
   def init(opts), do: opts
   
   def call(conn = %Plug.Conn { path_info: ["status"] }, _opts) do
-    conn |> respond(200, "")
+    conn |> respond(200, "", "")
   end
   
   def call(conn, opts) do
@@ -28,12 +29,28 @@ defmodule Promenade.HttpServer do
         opts |> Keyword.fetch!(:tables) |> Registry.data
       end
     
-    conn |> respond(200, TextFormat.snapshot(data))
+    accept =
+      case conn |> get_req_header("accept") do
+        []           -> ""
+        [accept | _] -> accept
+      end
+    
+    {format, content_type} =
+      if accept =~ "application/vnd.google.protobuf" do
+        {ProtobufFormat,
+          "application/vnd.google.protobuf; " <>
+          "proto=io.prometheus.client.MetricFamily; " <>
+          "encoding=delimited"}
+      else
+        {TextFormat, "text/plain; version=0.0.4"}
+      end
+    
+    conn |> respond(200, content_type, format.snapshot(data))
   end
   
-  defp respond(conn, code, body) do
+  defp respond(conn, code, content_type, body) do
     conn
-    |> put_resp_content_type("text/plain")
+    |> put_resp_content_type(content_type)
     |> send_resp(code, body)
   end
 end
