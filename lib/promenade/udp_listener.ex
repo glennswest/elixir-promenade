@@ -27,6 +27,6 @@ defmodule Promenade.UdpListener do
     
     metrics = Promenade.Decode.packet(packet)
     
-    registry |> Promenade.Registry.handle_metrics(metrics)  
+    registry |> Promenade.Registry.handle_metrics(metrics)
   end
 end
