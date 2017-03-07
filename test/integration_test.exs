@@ -51,7 +51,7 @@ defmodule IntegrationTest do
     c_id  = random_id()
     stdio = IO.stream(:stdio, :line)
     
-    cmd "make", ~w(release image=local/test-promenade), into: stdio
+    # cmd "make", ~w(release image=local/test-promenade), into: stdio
     
     Task.start_link fn ->
       cmd "docker", ~w(run --name #{c_id} local/test-promenade),
@@ -61,9 +61,6 @@ defmodule IntegrationTest do
     :timer.sleep(5_000) # wait for container to start
     
     c_ip = get_docker_ip(c_id)
-    
-    Logger.info("fetching empty initial metrics from HTTP")
-    assert curl_metrics(c_ip) == [""]
     
     Logger.info("sending some invalid metrics over UDP - should not crash")
     [
@@ -85,20 +82,28 @@ defmodule IntegrationTest do
     :timer.sleep(1_000) # wait for service to process the metrics
     
     Logger.info("fetching result metrics from HTTP")
-    assert curl_metrics(c_ip) == [
-      "# TYPE foo gauge",
-      "foo 88.0",
-      "",
-      "# TYPE bar counter",
-      "bar 99.0",
-      "",
-      "# TYPE baz summary",
-      "baz{quantile=\"0.5\"} 1.1",
-      "baz{quantile=\"0.9\"} 1.1",
-      "baz{quantile=\"0.99\"} 1.1",
-      "baz_sum 1.1",
-      "baz_count 1"
-    ]
+    body = (curl_metrics(c_ip) |> Enum.join("\n")) <> "\n"
+    assert body =~
+      """
+      # TYPE foo gauge
+      foo 88.0
+      """
+    
+    assert body =~
+      """
+      # TYPE bar counter
+      bar 99.0
+      """
+    
+    assert body =~
+      """
+      # TYPE baz summary
+      baz{quantile=\"0.5\"} 1.1
+      baz{quantile=\"0.9\"} 1.1
+      baz{quantile=\"0.99\"} 1.1
+      baz_sum 1.1
+      baz_count 1
+      """
     
     cmd "docker", ~w(rm -f #{c_id})
   end

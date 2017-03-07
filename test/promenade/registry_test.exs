@@ -4,6 +4,7 @@ defmodule Promenade.RegistryTest do
   
   alias Promenade.Registry
   alias Promenade.Summary
+  alias Promenade.VmGauges
   
   def make_subject, do: ({:ok, s} = Registry.start_link(nil, []); s)
   
@@ -21,7 +22,7 @@ defmodule Promenade.RegistryTest do
     ]
     
     {gauges, counters, summaries} =
-      subject |> Registry.get_tables |> Registry.data
+      subject |> Registry.get_tables |> Registry.data(false)
     
     assert Enum.sort(gauges) == [
       {"foo", %{
@@ -59,7 +60,7 @@ defmodule Promenade.RegistryTest do
     ]
     
     {gauges, counters, _summaries} =
-      subject |> Registry.get_tables |> Registry.data
+      subject |> Registry.get_tables |> Registry.data(false)
     
     assert Enum.sort(gauges) == [
       {"foo", %{
@@ -97,7 +98,7 @@ defmodule Promenade.RegistryTest do
         ]
         
         {_gauges, _counters, summaries} =
-          subject |> Registry.get_tables |> Registry.data
+          subject |> Registry.get_tables |> Registry.data(false)
         
         summary = Map.new(summaries) |> Map.get(name) |> Map.get(labels)
         
@@ -110,10 +111,10 @@ defmodule Promenade.RegistryTest do
     end
     
     # Flush data from the registry and confirm that it is emptied.
-    current_data = subject |> Registry.get_tables |> Registry.data
+    current_data = subject |> Registry.get_tables |> Registry.data(false)
     
-    assert (subject |> Registry.flush_data) == current_data
-    assert (subject |> Registry.flush_data) == {[], [], []}
+    assert (subject |> Registry.flush_data(false)) == current_data
+    assert (subject |> Registry.flush_data(false)) == {[], [], []}
     
     # Confirm that new metrics can be accumulated after clearing the tables.
     Registry.handle_metrics subject, [
@@ -123,7 +124,7 @@ defmodule Promenade.RegistryTest do
     ]
     
     {gauges, _counters, _summaries} =
-      subject |> Registry.get_tables |> Registry.data
+      subject |> Registry.get_tables |> Registry.data(false)
     
     assert Enum.sort(gauges) == [
       {"new_foo", %{
@@ -134,5 +135,27 @@ defmodule Promenade.RegistryTest do
         %{ "x" => "XXX", "y" => "YYY" } => 22.2
       }},
     ]
+    
+    # This time, get data with "internal" metrics included.
+    {gauges, counters, summaries} =
+      subject |> Registry.get_tables |> Registry.data(true)
+    
+    assert (gauges |> Enum.sort |> Enum.map(&elem(&1, 0))) ==
+      ["new_foo", "new_foo2"] ++ (VmGauges.get |> Enum.map(&elem(&1, 0)))
+    
+    assert counters == [{"promenade_metrics_total", %{ %{} => 3 }}]
+    
+    assert summaries == []
+    
+    # Now, flush data with "internal" metrics included.
+    {gauges, counters, summaries} =
+      subject |> Registry.flush_data(true)
+    
+    assert (gauges |> Enum.sort |> Enum.map(&elem(&1, 0))) ==
+      ["new_foo", "new_foo2"] ++ (VmGauges.get |> Enum.map(&elem(&1, 0)))
+    
+    assert counters == [{"promenade_metrics_total", %{ %{} => 3 }}]
+    
+    assert summaries == []
   end
 end

@@ -22,11 +22,13 @@ defmodule Promenade.HttpServer do
   end
   
   def call(conn, opts) do
+    incl_internal = opts |> Keyword.get(:include_internal, true)
+    
     data =
       if Promenade.memory_over_hwm? do
-        opts |> Keyword.fetch!(:registry) |> Registry.flush_data
+        opts |> Keyword.fetch!(:registry) |> Registry.flush_data(incl_internal)
       else
-        opts |> Keyword.fetch!(:tables) |> Registry.data
+        opts |> Keyword.fetch!(:tables) |> Registry.data(incl_internal)
       end
     
     accept =
