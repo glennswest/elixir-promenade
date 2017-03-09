@@ -26,6 +26,14 @@ defmodule Promenade.VmGaugesTest do
     assert is_pos gauges["promenade_vm_io_bytes"][%{"direction" => "input"}]
     assert is_pos gauges["promenade_vm_io_bytes"][%{"direction" => "output"}]
     
+    memory_bytes = gauges["promenade_vm_memory_bytes"]
+    assert is_pos memory_bytes[%{"kind" => "processes"}]
+    assert is_pos memory_bytes[%{"kind" => "atom"}]
+    assert is_pos memory_bytes[%{"kind" => "binary"}]
+    assert is_pos memory_bytes[%{"kind" => "code"}]
+    assert is_pos memory_bytes[%{"kind" => "ets"}]
+    assert is_pos memory_bytes[%{"kind" => "other_system"}]
+    
     assert is_pos gauges["promenade_vm_reductions"][%{}]
     
     assert Map.size(gauges["promenade_vm_run_queue_lengths"]) > 0
